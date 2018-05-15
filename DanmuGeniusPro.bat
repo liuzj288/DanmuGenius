@@ -1,9 +1,12 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.0.1
+mode con cols=80 lines=25 && set version=3.1.0
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
+if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=auto
 if not exist %batpath%\Bin echo 请下载Bin环境包! && pause
+if exist %batpath%\Bin set path=%batpath%\Bin;%path%
+if exist "%batpath%\AppData\music.list" for /f %%i in (%batpath%\AppData\music.list) do (start /min gplay.exe %%i)
 
 rem 制作程序环境
 if not exist %batpath%\AppData md %batpath%\AppData
@@ -17,12 +20,11 @@ cls
 echo mode:%mode%
 cd %batpath%/Temp/
 echo 模式：S-智能模式;A-自动模式(默认);M-手动模式
-echo 操作：E_添加备注;C_清空备注
-echo 说明：U_检查更新;H_查看帮助
+echo 操作：E_添加备注;C_清空备注;U_检查更新;H_查看帮助
 echo =======================================
-if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕
+if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕，共用时 %chronography% 秒！
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
-set /p moviename=请输入影片名：
+set /p moviename=请输入影片/保存文件夹名：
 if "%moviename%"=="" goto RE0
 if /i "%moviename%"=="S" set mode=smart&& goto RE0
 if /i "%moviename%"=="A" set mode=auto&& goto RE0
@@ -87,6 +89,8 @@ findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下
 
 
 :main
+set timestart=0%time%
+set /a secondstart=%timestart:~-5,2% && set /a minutestart=%timestart:~-8,2% && set /a hourstart=%timestart:~-11,2%
 if not exist %batpath%\Download\%moviename%（%year%） md %batpath%\Download\%moviename%（%year%）
 setlocal enabledelayedexpansion
 for /f %%z in (target_URL.txt) do (
@@ -94,19 +98,21 @@ set target=%%z
 echo !target! | findstr "https://www.bilibili.com/bangumi/" >nul && call %batpath%\Plugin\Bangumiplugin.bat
 echo !target! | findstr "av" >nul && call %batpath%\Plugin\Biliplugin.bat
 echo !target! | findstr "tucao" >nul && call %batpath%\Plugin\Tucaoplugin.bat
-echo !target! | findstr "iqiyi" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_iqiyi.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "youku" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=youku && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_youku.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "diyidan" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_diyidan.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "qq.com" >nul && cd %batpath%\Plugin\danmu-tools\ set web=tencent && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_tencent.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "acfun" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=acfun && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_acfun.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "iqiyi" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_iqiyi.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "youku" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=youku && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_youku.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "diyidan" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_diyidan.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "qq.com" >nul && cd %batpath%\Plugin\danmu-tools\ set web=tencent && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_tencent.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "acfun" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=acfun && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_acfun.xml && call %batpath%\Plugin\danmutools.bat
 )
 if not exist %batpath%\Download\%moviename%（%year%）\*.xml rd %batpath%\Download\%moviename%（%year%）
-if exist %batpath%\Temp\target_URL.txt del %batpath%\Temp\target_URL.txt
-if exist %batpath%\Temp\*.temp del %batpath%\Temp\*.temp
+if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
 
 :end
 cd %batpath%
-gplay.exe %batpath%\AppData\download-complete.wav
+gplay.exe %batpath%\AppData\download-complete.wav > nul
+set timeend=0%time%
+set /a secondend=%timeend:~-5,2% && set /a minuteend=%timeend:~-8,2% && set /a hourend=%timeend:~-11,2%
+set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
 goto RE0
 
 
@@ -119,7 +125,7 @@ goto RE0
 echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
-echo 当前版本%version% 最新版本 %versionnew% 请及时更新！
+echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && pause
 rem curl -# -k -L -O https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 ) else (echo 你正在使用最新版本！无需更新！)
 goto :eof
