@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.0
+mode con cols=80 lines=25 && set version=3.1.1
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
@@ -126,11 +126,11 @@ echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
 echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && pause
-echo 正在更新主程序
-curl -# -k -L -O https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 echo 正在更新插件
 curl -# -k -L -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
 curl -# -k -L -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
 curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
+echo 正在更新主程序
+curl -# -k -L -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 ) else (echo 你正在使用最新版本！无需更新！)
 goto :eof
