@@ -1,6 +1,6 @@
 @echo off
 mode con cols=80 lines=25 && set version=3.0.1
-title=弹幕精灵DanmuGeniusPro %version%
+title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 set mode=auto
 if not exist %batpath%\Bin echo 请下载Bin环境包! && pause
@@ -17,7 +17,8 @@ cls
 echo mode:%mode%
 cd %batpath%/Temp/
 echo 模式：S-智能模式;A-自动模式(默认);M-手动模式
-echo 操作：E_添加备注;C_清空备注(默认);U_检查更新
+echo 操作：E_添加备注;C_清空备注
+echo 说明：U_检查更新;H_查看帮助
 echo =======================================
 if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
@@ -29,6 +30,7 @@ if /i "%moviename%"=="M" set mode=manual&& goto RE0
 if /i "%moviename%"=="E" set /p target_keyword=请输入备注：&& goto RE0
 if /i "%moviename%"=="C" set target_keyword=&& goto RE0
 if /i "%moviename%"=="U" call :update && goto RE0
+if /i "%moviename%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE0
 
 URLEncode -e %moviename% -o keywords.temp && set /P keywords=<keywords.temp
 curl -s -k -L -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords%
@@ -115,11 +117,9 @@ goto RE0
 
 :update
 echo 正在检查更新……
-curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp
+curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
 echo 当前版本%version% 最新版本 %versionnew% 请及时更新！
 rem curl -# -k -L -O https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
-echo 测试
 ) else (echo 你正在使用最新版本！无需更新！)
-pause
 goto :eof
