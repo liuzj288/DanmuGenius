@@ -134,6 +134,6 @@ echo 正在更新Danmutools……
 curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 echo 正在更新主程序
 curl -# -k -L -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
-echo 更新成功！请继续使用！ && ping /n 5 127.0.0.1 >nul
+echo 更新成功！请继续使用！ && ping /n 5 127.0.0.1 >nul && start %batpath%\DanmuGeniusPro.bat && exit
 ) else (echo 你正在使用最新版本！无需更新！)
 goto :eof
