@@ -9,7 +9,7 @@ if exist %batpath%\Bin set path=%batpath%\Bin;%path%
 if exist "%batpath%\AppData\music.list" for /f %%i in (%batpath%\AppData\music.list) do (start /min gplay.exe %%i)
 
 rem 制作程序环境
-if not exist %batpath%\AppData md %batpath%\AppData
+if not exist %batpath%\AppData md %batpath%\AppData && echo %version% > %batpath%\AppData\version.txt  && curl -o %batpath%\AppData\download-complete.wav https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/download-complete.wav
 if not exist %batpath%\Plugin md %batpath%\Plugin
 if not exist %batpath%\Temp md %batpath%\Temp
 if not exist %batpath%\Download md %batpath%\Download
@@ -126,6 +126,11 @@ echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
 echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && pause
-rem curl -# -k -L -O https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
+echo 正在更新主程序
+curl -# -k -L -O https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
+echo 正在更新插件
+curl -# -k -L -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
+curl -# -k -L -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
+curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 ) else (echo 你正在使用最新版本！无需更新！)
 goto :eof
