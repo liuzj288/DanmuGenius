@@ -122,6 +122,7 @@ goto RE0
 ::=========================
 
 :update
+cls
 echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
