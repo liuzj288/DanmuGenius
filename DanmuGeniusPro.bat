@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.1
+mode con cols=80 lines=25 && set version=3.1.2
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
@@ -13,7 +13,7 @@ if not exist %batpath%\AppData md %batpath%\AppData && echo %version% > %batpath
 if not exist %batpath%\Plugin md %batpath%\Plugin
 if not exist %batpath%\Temp md %batpath%\Temp
 if not exist %batpath%\Download md %batpath%\Download
-
+if not exist %batpath%\Plugin\danmu-tools echo 警告：未检测到danmu-tools！只能解析B站弹幕！ && pause
 
 :RE0
 cls
@@ -125,12 +125,15 @@ goto RE0
 echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
-echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && pause
-echo 正在更新插件
+echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && ping /n 5 127.0.0.1 >nul
+echo 正在更新Bangumiplugin……
 curl -# -k -L -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
+echo 正在更新Biliplugin……
 curl -# -k -L -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
+echo 正在更新Danmutools……
 curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 echo 正在更新主程序
 curl -# -k -L -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
+echo 更新成功！请继续使用！ && ping /n 5 127.0.0.1 >nul
 ) else (echo 你正在使用最新版本！无需更新！)
 goto :eof
