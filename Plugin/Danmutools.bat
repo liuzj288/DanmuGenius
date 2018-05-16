@@ -1,4 +1,8 @@
 @echo off
-title=danmu-toolsplugin 1.0.1
-if "%target%"=="" echo 请使用启动器启动! && ping /5 127.0.0.1 >nul && exit
+cd %batpath%\Plugin\danmu-tools\
+java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u %target%
+
+cd %batpath%\Plugin\danmu-tools\DanMu\
+ren *.xml
+ren *. *_%web%.xml
 if exist "%batpath%\Plugin\danmu-tools\DanMu\*.xml" move "%batpath%\Plugin\danmu-tools\DanMu\*.xml" "%batpath%\Download\%moviename%（%year%）\" 
