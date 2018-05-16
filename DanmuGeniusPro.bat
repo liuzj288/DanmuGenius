@@ -37,6 +37,7 @@ if /i "%moviename%"=="C" set target_keyword=&& goto RE0
 if /i "%moviename%"=="U" call :update && goto RE0
 if /i "%moviename%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE0
 
+
 echo %moviename%> "%batpath%\Temp\moviename.temp"
 URLEncode -e %moviename% -o keywords.temp && set /P keywords=<keywords.temp
 curl -s -k -L -R --retry 5 --retry-delay 30 -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords%
@@ -48,7 +49,8 @@ egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | head -1 > target_year.t
 egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | xargs -n 10
 :RE1
 if "%mode%" NEQ "smart" set /p year=请输入年份（当前默认为:%year%）：|| goto RE2
-
+if /i "%year%"=="R" del /q %batpath%\Temp\*.*  && goto RE0
+for /f "delims=0123456789" %%y in ("%year%") do if not "%%y"=="" echo 年份输入错误：不是纯数字！&& set year=&& ping /n 3 127.0.0.1 > nul && goto RE1
 
 URLEncode -e %moviename%%year% -o keywords.temp 
 sed -i "s#%%#%%7C#g;s#[a-z]#\u&#g" keywords.temp && set /P keywords=<keywords.temp
