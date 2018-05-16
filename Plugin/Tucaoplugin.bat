@@ -1,4 +1,5 @@
 @echo off
+if "%target%"=="" echo 请使用启动器启动 && ping /5 127.0.0.1 >nul && exit
 title=Tucaoplugin 1.0.1 正在下载 %target%
 set target=%target:http://www.tucao.tv/play/h=%
 set target=%target:/=%
