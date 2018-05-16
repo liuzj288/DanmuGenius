@@ -1,4 +1,4 @@
-@echo on
+@echo off
 mode con cols=80 lines=26 && set version=3.1.8
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
@@ -112,11 +112,11 @@ set target=%%z
 echo !target! | findstr "https://www.bilibili.com/bangumi/" >nul && call %batpath%\Plugin\Bangumiplugin.bat
 echo !target! | findstr /r "[aA][vV]" >nul && call %batpath%\Plugin\Biliplugin.bat
 echo !target! | findstr "tucao" >nul && call %batpath%\Plugin\Tucaoplugin.bat
-echo !target! | findstr "iqiyi" >nul && set web=iqiyi && cls && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "youku" >nul && set web=youku && cls && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "diyidan" >nul && set web=diyidan && cls && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "qq" >nul && set web=tencent && cls && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "acfun" >nul && set web=acfun && cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "iqiyi" >nul && set web=iqiyi&& cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "youku" >nul && set web=youku&& cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "diyidan" >nul && set web=diyidan&& cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "qq" >nul && set web=tencent&& cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "acfun" >nul && set web=acfun&& cls && call %batpath%\Plugin\danmutools.bat
 )
 setlocal disabledelayedexpansion
 if not exist %batpath%\Download\%moviename%（%year%）\*.xml rd %batpath%\Download\%moviename%（%year%）
@@ -130,7 +130,7 @@ set /a secondend=%timeend:~-4,2% && set /a minuteend=%timeend:~-6,2% && set /a h
 if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
 set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
 cd %batpath%
-pause
+ping /n 5 127.0.0.1 >nul
 goto RE0
 
 
