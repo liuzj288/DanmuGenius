@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.7
+mode con cols=80 lines=25 && set version=3.1.6
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo Çë½âÑ¹µ½²»°üº¬¿Õ¸ñÂ·¾¶£¡ && pause && exit
@@ -29,6 +29,9 @@ if not exist %batpath%\Temp\moviename.temp set /p moviename=ÇëÊäÈëÓ°Æ¬Ãû(±£´æÎÄ¼
 if exist %batpath%\Temp\moviename.temp set /P moviename=<%batpath%\Temp\moviename.temp
 if exist %batpath%\Temp\moviename.temp echo ÇëÊäÈëÓ°Æ¬Ãû(±£´æÎÄ¼ş¼Ğ)£º%moviename%
 if "%moviename%"=="" goto RE0
+if "%moviename: =%" NEQ "%moviename%" echo Ó°Æ¬ÃûÇë²»ÒªÊäÈë¿Õ¸ñ£¡ && ping /n 3 127.0.0.1 >nul && goto RE0
+if "%moviename:\=%" NEQ "%moviename%" echo Ó°Æ¬ÃûÇë²»ÒªÊäÈëÌØÊâ×Ö·û£¡ && ping /n 3 127.0.0.1 >nul && goto RE0
+if "%moviename:/=%" NEQ "%moviename%" echo Ó°Æ¬ÃûÇë²»ÒªÊäÈëÌØÊâ×Ö·û£¡ && ping /n 3 127.0.0.1 >nul && goto RE0
 if /i "%moviename%"=="S" set mode=smart&& goto RE0
 if /i "%moviename%"=="A" set mode=auto&& goto RE0
 if /i "%moviename%"=="M" set mode=manual&& goto RE0
@@ -44,13 +47,15 @@ curl -s -k -L -R --retry 5 --retry-delay 30 -o target_utf8.temp https://api.doub
 iconv -c -f UTF-8 -t GBK target_utf8.temp > target_gbk.temp
 sed -i "s#\"#\n#g" target_gbk.temp
 sed -i "/:/d;/,/d" target_gbk.temp && del *.
+:RE1
 echo ÇëÑ¡Ôñ¹«Ó³Ê±¼ä£º
 egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | head -1 > target_year.temp && set /P year=<target_year.temp 
 egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | xargs -n 10
-:RE1
 if "%mode%" NEQ "smart" set /p year=ÇëÊäÈëÄê·İ£¨µ±Ç°Ä¬ÈÏÎª:%year%£©£º|| goto RE2
 if /i "%year%"=="R" del /q %batpath%\Temp\*.*  && goto RE0
-for /f "delims=0123456789" %%y in ("%year%") do if not "%%y"=="" echo Äê·İÊäÈë´íÎó£º²»ÊÇ´¿Êı×Ö£¡&& set year=&& ping /n 3 127.0.0.1 > nul && goto RE1
+for /f "delims=0123456789" %%y in ("%year%") do if not "%%y"=="" echo ÊäÈë´íÎó£º²»ÊÇ´¿Êı×Ö£¡&& ping /n 3 127.0.0.1 > nul && goto RE1
+if %year% LEQ 1000 echo ÊäÈë´íÎó£ºÇëÊäÈëÕıÈ·Äê·İ£¡&& ping /n 3 127.0.0.1 > nul && goto RE1
+if %year% GEQ 3000 echo ÊäÈë´íÎó£ºÇëÊäÈëÕıÈ·Äê·İ£¡&& ping /n 3 127.0.0.1 > nul && goto RE1
 
 URLEncode -e %moviename%%year% -o keywords.temp 
 sed -i "s#%%#%%7C#g;s#[a-z]#\u&#g" keywords.temp && set /P keywords=<keywords.temp
@@ -62,7 +67,7 @@ sed -i "s#'/video/#\n#g;s#'#\n#g" target_gbk.temp && del *.
 egrep "^av" target_gbk.temp > target_URL.temp
 egrep "/J/default/"  target_gbk.temp | sed "s#^#http://www.jijidown.com#g" |sort |uniq > target_pages.temp
 for /f %%p in (target_pages.temp) do (
-curl -s -R --retry 5 --retry-delay 30 -o target_utf8.temp %%p -H Accept-Encoding:gzip,defalte
+curl -s -R --retry 5 --retry-delay 30 -o target_utf8.temp %%p
 iconv -c -f UTF-8 -t GBK  target_utf8.temp > target_gbk.temp
 sed -i "/¼ô¼­/d;/Æ¬¶Î/d;/Ô¤¸æ/d;/îA¸æ/d;/»ì¼ô/d;/×ÔÖÆ/d;/×Ô¼ô/d;/Æ¬¶Î/d;/²åÇú/d;/ÅäÀÖ/d;/Ä»ºó/d;/¹È°¢Äª/d" target_gbk.temp && del *.
 sed -i "s#\"#\n#g" target_gbk.temp
@@ -141,7 +146,7 @@ curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Biliplugin.bat h
 echo ÕıÔÚ¸üĞÂDanmutools¡­¡­
 curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 echo ÕıÔÚ¸üĞÂÖ÷³ÌĞò¡­¡­
-curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
+curl -# -k -L -R --retry 5 --retry-delay 40 -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 echo ¸üĞÂ³É¹¦£¡Çë¼ÌĞøÊ¹ÓÃ£¡ && ping /n 5 127.0.0.1 >nul && start %batpath%\DanmuGeniusPro.bat && exit
 ) else (echo ÄãÕıÔÚÊ¹ÓÃ×îĞÂ°æ±¾£¡ÎŞĞè¸üĞÂ£¡&& ping /n 5 127.0.0.1 >nul)
 goto :eof
