@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=26 && set version=3.1.8
+mode con cols=80 lines=26 && set version=3.2.0
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=auto
@@ -95,7 +95,7 @@ set target_URL=%target_URL:http://www.bilibili.com/video/=% && set target_URL=%t
 if /i "%target_URL%"=="S" goto main
 if /i %target_URL%==E start /wait target_URL.txt && goto RE2
 if /i %target_URL%==C echo. 2>target_URL.txt && goto RE2
-if /i %target_URL%==F start https://www.biliplus.com/api/do.php?act=search^&word=%moviename% && start https://www.bilibili.com/sp/%moviename% && goto RE2
+if /i %target_URL%==F start https://www.biliplus.com/api/do.php?act=search^&word=%moviename% && start https://www.bilibili.com/sp/%moviename% && start http://so.iqiyi.com/so/q_%moviename% && start http://www.soku.com/search_video/q_%moviename% && goto RE2
 if /i %target_URL%==Q goto RE0
 findstr "%target_URL%" target_URL.txt >nul && echo 警告：重复任务！ && ping -n 2 127.0.0.1 >nul && goto RE2
 findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下载！ && ping -n 2 127.0.0.1 >nul && goto RE2 || echo %target_URL%>> target_URL.txt && goto RE2
