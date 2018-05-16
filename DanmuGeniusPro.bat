@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.5
+mode con cols=80 lines=25 && set version=3.1.6
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
@@ -35,7 +35,7 @@ if /i "%moviename%"=="U" call :update && goto RE0
 if /i "%moviename%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE0
 
 URLEncode -e %moviename% -o keywords.temp && set /P keywords=<keywords.temp
-curl -s -k -L -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords%
+curl -s -k -L -R --retry 5 --retry-delay 10 -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords%
 iconv -c -f UTF-8 -t GBK target_utf8.temp > target_gbk.temp
 sed -i "s#\"#\n#g" target_gbk.temp
 sed -i "/:/d;/,/d" target_gbk.temp && del *.
@@ -48,7 +48,7 @@ if "%mode%" NEQ "smart" set /p year=请输入年份（当前默认为:%year%）：|| goto RE2
 
 URLEncode -e %moviename%%year% -o keywords.temp 
 sed -i "s#%%#%%7C#g;s#[a-z]#\u&#g" keywords.temp && set /P keywords=<keywords.temp
-curl -s -o target_utf8.temp http://www.jijidown.com/Search/%keywords%
+curl -s -R --retry 5 --retry-delay 10 -o target_utf8.temp http://www.jijidown.com/Search/%keywords%
 iconv -c -f UTF-8 -t GBK  target_utf8.temp > target_gbk.temp
 sed -i "/剪辑/d;/片段/d;/预告/d;/預告/d;/混剪/d;/自制/d;/自剪/d;/片段/d;/插曲/d;/配乐/d;/幕后/d;/谷阿莫/d" target_gbk.temp && del *.
 sed -i "s#\"#\n#g" target_gbk.temp
@@ -56,7 +56,7 @@ sed -i "s#'/video/#\n#g;s#'#\n#g" target_gbk.temp && del *.
 egrep "^av" target_gbk.temp > target_URL.temp
 egrep "/J/default/"  target_gbk.temp | sed "s#^#http://www.jijidown.com#g" |sort |uniq > target_pages.temp
 for /f %%p in (target_pages.temp) do (
-curl -s -o target_utf8.temp %%p
+curl -s -R --retry 5 --retry-delay 10 -o target_utf8.temp %%p
 iconv -c -f UTF-8 -t GBK  target_utf8.temp > target_gbk.temp
 sed -i "/剪辑/d;/片段/d;/预告/d;/預告/d;/混剪/d;/自制/d;/自剪/d;/片段/d;/插曲/d;/配乐/d;/幕后/d;/谷阿莫/d" target_gbk.temp && del *.
 sed -i "s#\"#\n#g" target_gbk.temp
@@ -129,13 +129,13 @@ curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent
 if "%version%" NEQ "%versionnew%" (
 echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && ping /n 3 127.0.0.1 >nul
 echo 正在更新Bangumiplugin……
-curl -# -k -L -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
+curl -# -k -L -R --retry 5 --retry-delay 10 -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
 echo 正在更新Biliplugin……
-curl -# -k -L -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
+curl -# -k -L -R --retry 5 --retry-delay 10 -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
 echo 正在更新Danmutools……
-curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
+curl -# -k -L -R --retry 5 --retry-delay 10 -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 echo 正在更新主程序……
-curl -# -k -L -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
+curl -# -k -L -R --retry 5 --retry-delay 10 -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 echo 更新成功！请继续使用！ && ping /n 5 127.0.0.1 >nul && start %batpath%\DanmuGeniusPro.bat && exit
 ) else (echo 你正在使用最新版本！无需更新！&& ping /n 5 127.0.0.1 >nul)
 goto :eof
