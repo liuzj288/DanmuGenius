@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.6
+mode con cols=80 lines=25 && set version=3.1.7
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
@@ -20,11 +20,14 @@ cls
 echo mode:%mode%
 cd %batpath%/Temp/
 echo 模式：S-智能模式;A-自动模式(默认);M-手动模式
-echo 操作：E_添加标签;C_清空标签;U_检查更新;H_查看帮助
+echo 说明：R_重新开始;U_检查更新;H_查看帮助
+echo 操作：E_添加标签;C_清空标签;
 echo =======================================
 if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕，共用时 %chronography% 秒！
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
-set /p moviename=请输入影片名(保存文件夹)：
+if not exist %batpath%\Temp\moviename.temp set /p moviename=请输入影片名(保存文件夹)：
+if exist %batpath%\Temp\moviename.temp set /P moviename=<%batpath%\Temp\moviename.temp
+if exist %batpath%\Temp\moviename.temp echo 请输入影片名(保存文件夹)：%moviename%
 if "%moviename%"=="" goto RE0
 if /i "%moviename%"=="S" set mode=smart&& goto RE0
 if /i "%moviename%"=="A" set mode=auto&& goto RE0
@@ -34,8 +37,9 @@ if /i "%moviename%"=="C" set target_keyword=&& goto RE0
 if /i "%moviename%"=="U" call :update && goto RE0
 if /i "%moviename%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE0
 
+echo %moviename%> "%batpath%\Temp\moviename.temp"
 URLEncode -e %moviename% -o keywords.temp && set /P keywords=<keywords.temp
-curl -s -k -L -R --retry 5 --retry-delay 30 -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords% -H Accept-Encoding:gzip,defalte
+curl -s -k -L -R --retry 5 --retry-delay 30 -o target_utf8.temp https://api.douban.com/v2/movie/search?q=%keywords%
 iconv -c -f UTF-8 -t GBK target_utf8.temp > target_gbk.temp
 sed -i "s#\"#\n#g" target_gbk.temp
 sed -i "/:/d;/,/d" target_gbk.temp && del *.
@@ -90,7 +94,7 @@ findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下
 
 
 :main
-set timestart=0%time%
+set timestart=00%time: =%
 set /a secondstart=%timestart:~-5,2% && set /a minutestart=%timestart:~-8,2% && set /a hourstart=%timestart:~-11,2%
 if not exist %batpath%\Download\%moviename%（%year%） md %batpath%\Download\%moviename%（%year%）
 setlocal enabledelayedexpansion
@@ -111,9 +115,9 @@ if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
 :end
 cd %batpath%
 gplay.exe %batpath%\AppData\download-complete.wav > nul
-set timeend=0%time%
+set timeend=0%time: =%
 set /a secondend=%timeend:~-5,2% && set /a minuteend=%timeend:~-8,2% && set /a hourend=%timeend:~-11,2%
-set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
+set /a chronography=ABS((%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%))
 goto RE0
 
 
