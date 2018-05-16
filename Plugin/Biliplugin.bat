@@ -1,7 +1,7 @@
 @echo OFF
-set version=1.0.2
+set version=1.0.3
 title=Biliplugin %version%：正在下载 %target%
-if "%target%"=="" echo 请使用启动器启动 && pause && exit
+if "%target%"=="" echo 请使用启动器启动 && ping /5 127.0.0.1 >nul && exit
 
 :main
 echo %target%| findstr /r "[aA][vV]" >nul && echo %target%| sed -r "s#http://www.jijidown.com/video/[aA][vV]##g;s#[aA][vV]##g;s#/##g"> target_av.temp && goto av2cid

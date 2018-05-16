@@ -1,7 +1,7 @@
 @echo OFF
-set version=1.0.1
+set version=1.0.2
 title=Bangumiplugin %version%：正在下载 %target%
-if "%target%"=="" echo 请使用启动器启动 && pause && exit
+if "%target%"=="" echo 请使用启动器启动 && ping /5 127.0.0.1 >nul && exit
 
 :curl_target
 curl -s -k -L -o target_utf8.temp %target%
