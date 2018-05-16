@@ -1,10 +1,10 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.2
+mode con cols=80 lines=25 && set version=3.1.5
 title=DanmuGeniusPro %version%
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=auto
-if not exist %batpath%\Bin echo 请下载Bin环境包! && pause
+if not exist %batpath%\Bin\*.exe echo 请下载Bin环境包!按回车确认下载！ && pause && curl -# -k -L -o %batpath%\Bin.zip https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Bin.zip
 if exist %batpath%\Bin set path=%batpath%\Bin;%path%
 if exist "%batpath%\AppData\music.list" for /f %%i in (%batpath%\AppData\music.list) do (start /min gplay.exe %%i)
 
@@ -20,11 +20,11 @@ cls
 echo mode:%mode%
 cd %batpath%/Temp/
 echo 模式：S-智能模式;A-自动模式(默认);M-手动模式
-echo 操作：E_添加备注;C_清空备注;U_检查更新;H_查看帮助
+echo 操作：E_添加标签;C_清空标签;U_检查更新;H_查看帮助
 echo =======================================
 if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕，共用时 %chronography% 秒！
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
-set /p moviename=请输入影片/保存文件夹名：
+set /p moviename=请输入影片名(保存文件夹)：
 if "%moviename%"=="" goto RE0
 if /i "%moviename%"=="S" set mode=smart&& goto RE0
 if /i "%moviename%"=="A" set mode=auto&& goto RE0
@@ -75,14 +75,15 @@ echo 任务列表：
 if exist target_URL.txt cat -b target_URL.txt
 echo.
 echo =======================================
-echo 操作：E_编辑列表;C_清空列表；
+echo 操作：E_编辑列表;C_清空列表；F_查找弹幕
 echo 说明：S_开始下载;Q_返回上层
 echo =======================================
 set /p target_URL=请粘贴URL、AV号或CID号：
-set target_URL=%target_URL:http://www.jijidown.com/video/=% && set target_URL=%target_URL:http://www.bilibili.com/video/=% && set target_URL=%target_URL:https://www.bilibili.com/video/=%
+set target_URL=%target_URL:http://www.bilibili.com/video/=% && set target_URL=%target_URL:https://www.bilibili.com/video/=% && set target_URL=%target_URL:http://www.jijidown.com/video/=% && set target_URL=%target_URL:https://www.biliplus.com/all/video/=%
 if /i "%target_URL%"=="S" goto main
 if /i %target_URL%==E start /wait target_URL.txt && goto RE2
 if /i %target_URL%==C echo. 2>target_URL.txt && goto RE2
+if /i %target_URL%==F start https://www.biliplus.com/api/do.php?act=search^&word=%moviename% && start https://www.bilibili.com/sp/%moviename% && goto RE2
 if /i %target_URL%==Q goto RE0
 findstr "%target_URL%" target_URL.txt >nul && echo 警告：重复任务！ && ping -n 2 127.0.0.1 >nul && goto RE2
 findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下载！ && ping -n 2 127.0.0.1 >nul && goto RE2 || echo %target_URL%>> target_URL.txt && goto RE2
@@ -96,7 +97,7 @@ setlocal enabledelayedexpansion
 for /f %%z in (target_URL.txt) do (
 set target=%%z
 echo !target! | findstr "https://www.bilibili.com/bangumi/" >nul && call %batpath%\Plugin\Bangumiplugin.bat
-echo !target! | findstr "av" >nul && call %batpath%\Plugin\Biliplugin.bat
+echo !target! | findstr /r "[aA][vV]" >nul && call %batpath%\Plugin\Biliplugin.bat
 echo !target! | findstr "tucao" >nul && call %batpath%\Plugin\Tucaoplugin.bat
 echo !target! | findstr "iqiyi" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_iqiyi.xml && call %batpath%\Plugin\danmutools.bat
 echo !target! | findstr "youku" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=youku && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_youku.xml && call %batpath%\Plugin\danmutools.bat
@@ -126,15 +127,15 @@ cls
 echo 正在检查更新……
 curl -k -L -s -o %batpath%\AppData\versionnew.temp https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/AppData/version.txt && set /P versionnew=<%batpath%\AppData\versionnew.temp && del %batpath%\AppData\versionnew.temp
 if "%version%" NEQ "%versionnew%" (
-echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && ping /n 5 127.0.0.1 >nul
+echo 当前版本%version% 最新版本 %versionnew% 请及时更新！ && ping /n 3 127.0.0.1 >nul
 echo 正在更新Bangumiplugin……
 curl -# -k -L -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
 echo 正在更新Biliplugin……
 curl -# -k -L -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
 echo 正在更新Danmutools……
 curl -# -k -L -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
-echo 正在更新主程序
+echo 正在更新主程序……
 curl -# -k -L -o %batpath%\DanmuGeniusPro.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/DanmuGeniusPro.bat
 echo 更新成功！请继续使用！ && ping /n 5 127.0.0.1 >nul && start %batpath%\DanmuGeniusPro.bat && exit
-) else (echo 你正在使用最新版本！无需更新！)
+) else (echo 你正在使用最新版本！无需更新！&& ping /n 5 127.0.0.1 >nul)
 goto :eof
