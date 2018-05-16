@@ -13,6 +13,7 @@ for /f "delims=" %%p in ('sed -n "$=" target_epid.temp') do set /a epid_num=%%p
 
 :main
 SETLOCAL ENABLEDELAYEDEXPANSION
+set /p quantity<=quantity.temp
 set /a m=1001
 set /a n=1
 for /f %%z in (target_epid.temp) do (
@@ -30,6 +31,7 @@ call :get_xml !target_pcid!
 for %%i in ( %batpath%\temp\cid!target_pcid!.xml )do if %%~zi lss 51200 ( del "%%i" ) else (
 move %batpath%\temp\cid!target_pcid!.xml  "%batpath%\Download\%moviename%£¨%year%£©\av!target_av: =!_P!m:~-2!_%target_title%_!target_ptitle!_cid!target_pcid!.xml" >nul
 call :save_data "!target_pcid: =!" "!target_av: =!" "P!m:~-2! !target_ptitle!" "%target_keyword%"
+set /a quantity=!quantity!+1
 )
 set /a n=!n!+1
 set /a m=!m!+1
@@ -37,6 +39,7 @@ set /a m=!m!+1
 SETLOCAL DISABLEDELAYEDEXPANSION
 
 :end
+echo %quantity% >quantity.temp
 goto :eof
 
 
