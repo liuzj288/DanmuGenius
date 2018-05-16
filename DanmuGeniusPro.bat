@@ -1,6 +1,5 @@
 @echo off
-mode con cols=80 lines=25 && set version=3.1.6
-title=DanmuGeniusPro %version%
+mode con cols=80 lines=26 && set version=3.1.7
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=auto
@@ -13,9 +12,10 @@ if not exist %batpath%\AppData md %batpath%\AppData && echo %version% > %batpath
 if not exist %batpath%\Plugin md %batpath%\Plugin
 if not exist %batpath%\Temp md %batpath%\Temp
 if not exist %batpath%\Download md %batpath%\Download
-if not exist %batpath%\Plugin\danmu-tools echo 警告：未检测到danmu-tools！只能解析B站弹幕！ && pause
+if not exist %batpath%\Plugin\danmu-tools\downloader.jar echo 警告：未检测到danmu-tools！只能解析B站弹幕！请加入QQ群(495877205)获取最新danmu-tools! && pause
 
 :RE0
+title=DanmuGeniusPro %version%
 cls
 echo mode:%mode%
 cd %batpath%/Temp/
@@ -23,7 +23,7 @@ echo 模式：S-智能模式;A-自动模式(默认);M-手动模式
 echo 说明：R_重新开始;U_检查更新;H_查看帮助
 echo 操作：E_添加标签;C_清空标签;
 echo =======================================
-if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）已下载完毕，共用时 %chronography% 秒！
+if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）下载完毕！ 用时 %chronography% 秒！ 下载弹幕 %quantity%个！
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
 if not exist %batpath%\Temp\moviename.temp set /p moviename=请输入影片名(保存文件夹)：
 if exist %batpath%\Temp\moviename.temp set /P moviename=<%batpath%\Temp\moviename.temp
@@ -90,6 +90,7 @@ echo 操作：E_编辑列表;C_清空列表；F_查找弹幕
 echo 说明：S_开始下载;Q_返回上层
 echo =======================================
 set /p target_URL=请粘贴URL、AV号或CID号：
+if "%target_URL: =%" NEQ "%target_URL%" echo 输入错误：请不要输入空格！ && ping /n 3 127.0.0.1 >nul && goto RE2
 set target_URL=%target_URL:http://www.bilibili.com/video/=% && set target_URL=%target_URL:https://www.bilibili.com/video/=% && set target_URL=%target_URL:http://www.jijidown.com/video/=% && set target_URL=%target_URL:https://www.biliplus.com/all/video/=%
 if /i "%target_URL%"=="S" goto main
 if /i %target_URL%==E start /wait target_URL.txt && goto RE2
@@ -101,8 +102,9 @@ findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下
 
 
 :main
-set timestart=00%time: =%
-set /a secondstart=%timestart:~-5,2% && set /a minutestart=%timestart:~-8,2% && set /a hourstart=%timestart:~-11,2%
+echo 00%time%| sed "s/://g;s/\.//g">%batpath%\Temp\time.temp && set /P timestart=<%batpath%\Temp\time.temp
+set /a secondstart=%timestart:~-4,2% && set /a minutestart=%timestart:~-6,2% && set /a hourstart=%timestart:~-8,2%
+set quantity=0 && echo %quantity% 1>quantity.temp
 if not exist %batpath%\Download\%moviename%（%year%） md %batpath%\Download\%moviename%（%year%）
 setlocal enabledelayedexpansion
 for /f %%z in (target_URL.txt) do (
@@ -116,15 +118,18 @@ echo !target! | findstr "diyidan" >nul && cd %batpath%\Plugin\danmu-tools\ && se
 echo !target! | findstr "qq.com" >nul && cd %batpath%\Plugin\danmu-tools\ set web=tencent && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_tencent.xml && call %batpath%\Plugin\danmutools.bat
 echo !target! | findstr "acfun" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=acfun && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_acfun.xml && call %batpath%\Plugin\danmutools.bat
 )
+setlocal disabledelayedexpansion
 if not exist %batpath%\Download\%moviename%（%year%）\*.xml rd %batpath%\Download\%moviename%（%year%）
-if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
+if exist quantity.temp set/P quantity=<quantity.temp 
+
 
 :end
+play.exe %batpath%\AppData\download-complete.wav > nul
+echo 00%time%| sed "s/://g;s/\.//g">%batpath%\Temp\time.temp && set /P timeend=<%batpath%\Temp\time.temp
+set /a secondend=%timeend:~-4,2% && set /a minuteend=%timeend:~-6,2% && set /a hourend=%timeend:~-8,2%
+if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
+set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
 cd %batpath%
-gplay.exe %batpath%\AppData\download-complete.wav > nul
-set timeend=0%time: =%
-set /a secondend=%timeend:~-5,2% && set /a minuteend=%timeend:~-8,2% && set /a hourend=%timeend:~-11,2%
-set /a chronography=ABS((%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%))
 goto RE0
 
 
@@ -143,6 +148,8 @@ echo 正在更新Bangumiplugin……
 curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Bangumiplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Bangumiplugin.bat
 echo 正在更新Biliplugin……
 curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Biliplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Biliplugin.bat
+echo 正在更新Tucaoplugin……
+curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Tucaoplugin.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/Tucaoplugin.bat
 echo 正在更新Danmutools……
 curl -# -k -L -R --retry 5 --retry-delay 30 -o %batpath%\Plugin\Danmutools.bat https://raw.githubusercontent.com/liuzj288/DanmuGenius/master/Plugin/danmutools.bat
 echo 正在更新主程序……
