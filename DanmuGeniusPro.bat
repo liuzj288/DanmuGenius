@@ -1,5 +1,5 @@
-@echo off
-mode con cols=80 lines=26 && set version=3.1.7
+@echo on
+mode con cols=80 lines=26 && set version=3.1.8
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=auto
@@ -112,11 +112,11 @@ set target=%%z
 echo !target! | findstr "https://www.bilibili.com/bangumi/" >nul && call %batpath%\Plugin\Bangumiplugin.bat
 echo !target! | findstr /r "[aA][vV]" >nul && call %batpath%\Plugin\Biliplugin.bat
 echo !target! | findstr "tucao" >nul && call %batpath%\Plugin\Tucaoplugin.bat
-echo !target! | findstr "iqiyi" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_iqiyi.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "youku" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=youku && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_youku.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "diyidan" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=iqiyi && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_diyidan.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "qq.com" >nul && cd %batpath%\Plugin\danmu-tools\ set web=tencent && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_tencent.xml && call %batpath%\Plugin\danmutools.bat
-echo !target! | findstr "acfun" >nul && cd %batpath%\Plugin\danmu-tools\ && set web=acfun && cls && java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u !target! && cd %batpath%\Plugin\danmu-tools\DanMu\ && ren *.xml *. && ren *. *_acfun.xml && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "iqiyi" >nul && set web=iqiyi && cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "youku" >nul && set web=youku && cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "diyidan" >nul && set web=diyidan && cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "qq" >nul && set web=tencent && cls && call %batpath%\Plugin\danmutools.bat
+echo !target! | findstr "acfun" >nul && set web=acfun && cls && call %batpath%\Plugin\danmutools.bat
 )
 setlocal disabledelayedexpansion
 if not exist %batpath%\Download\%moviename%（%year%）\*.xml rd %batpath%\Download\%moviename%（%year%）
@@ -124,12 +124,13 @@ if exist quantity.temp set/P quantity=<quantity.temp
 
 
 :end
-play.exe %batpath%\AppData\download-complete.wav > nul
+gplay.exe %batpath%\AppData\download-complete.wav > nul
 echo 00%time%| sed "s/://g;s/\.//g">%batpath%\Temp\time.temp && set /P timeend=<%batpath%\Temp\time.temp
 set /a secondend=%timeend:~-4,2% && set /a minuteend=%timeend:~-6,2% && set /a hourend=%timeend:~-8,2%
 if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
 set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
 cd %batpath%
+pause
 goto RE0
 
 
