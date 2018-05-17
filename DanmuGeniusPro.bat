@@ -1,5 +1,5 @@
 @echo off
-mode con cols=80 lines=26 && set version=3.2.5
+mode con cols=80 lines=26 && set version=3.3.0
 set batpath=%~dp0%
 if "%batpath%" NEQ "%batpath: =%" echo 请解压到不包含空格路径！ && pause && exit
 set mode=share
@@ -19,9 +19,8 @@ title=DanmuGeniusPro %version%
 cls
 echo mode:%mode%
 cd %batpath%/Temp/
-echo 模式：S-智能模式;A-自动模式(默认);M-分享模式
+echo 模式：A-自动模式(默认);S-分享模式;E_添加标签;C_清空标签
 echo 说明：R_重新开始;U_检查更新;H_查看帮助
-echo 操作：E_添加标签;C_清空标签;
 echo =======================================
 if "%moviename%" NEQ "" if exist "%batpath%\Download\%moviename%（%year%）/*.xml" echo 提示：%moviename%（%year%）下载完毕！ 用时 %chronography% 秒！ 下载弹幕 %quantity%个！
 if "%target_keyword%" NEQ "" echo 备注：%target_keyword%
@@ -32,7 +31,6 @@ if "%moviename%"=="" goto RE0
 if "%moviename: =%" NEQ "%moviename%" echo 影片名请不要输入空格！ && ping /n 3 127.0.0.1 >nul && goto RE0
 if "%moviename:\=%" NEQ "%moviename%" echo 影片名请不要输入特殊字符！ && ping /n 3 127.0.0.1 >nul && goto RE0
 if "%moviename:/=%" NEQ "%moviename%" echo 影片名请不要输入特殊字符！ && ping /n 3 127.0.0.1 >nul && goto RE0
-if /i "%moviename%"=="S" set mode=smart&& goto RE0
 if /i "%moviename%"=="A" set mode=auto&& goto RE0
 if /i "%moviename%"=="M" set mode=share&& goto RE0
 if /i "%moviename%"=="E" set /p target_keyword=请输入备注：&& goto RE0
@@ -49,18 +47,19 @@ sed -i "s#\"#\n#g" target_gbk.temp
 sed -i "/:/d;/,/d" target_gbk.temp && del *.
 
 :RE1
-echo 请选择公映时间：
+echo =======================================
+echo 请选择公映时间(按F查找)：
 egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | head -1 > target_year.temp && set /P year=<target_year.temp 
 egrep -A1 "year" target_gbk.temp | egrep "[[:digit:]]" | xargs -n 10
-if "%mode%" NEQ "smart" set /p year=请输入年份（当前默认为:%year%）：|| goto RE2
+set /p year=请输入年份（当前默认为:%year%）：|| goto RE2
+if /i "%year%"=="F" start https://movie.douban.com/subject_search?search_text=%moviename% && goto RE1
 if /i "%year%"=="R" del /q %batpath%\Temp\*.*  && goto RE0
-if /i "%moviename%"=="S" set mode=smart&& goto RE0
-if /i "%moviename%"=="A" set mode=auto&& goto RE0
-if /i "%moviename%"=="M" set mode=share&& goto RE0
-if /i "%moviename%"=="E" set /p target_keyword=请输入备注：&& goto RE0
-if /i "%moviename%"=="C" set target_keyword=&& goto RE0
-if /i "%moviename%"=="U" call :update && goto RE0
-if /i "%moviename%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE0
+if /i "%year%"=="A" set mode=auto&& goto RE1
+if /i "%year%"=="M" set mode=share&& goto RE1
+if /i "%year%"=="E" set /p target_keyword=请输入备注：&& goto RE0
+if /i "%year%"=="C" set target_keyword=&& goto RE0
+if /i "%year%"=="U" call :update && goto RE0
+if /i "%year%"=="H" start https://github.com/liuzj288/DanmuGenius/blob/master/README.md && goto RE1
 for /f "delims=0123456789" %%y in ("%year%") do if not "%%y"=="" echo 输入错误：不是纯数字！&& ping /n 3 127.0.0.1 > nul && goto RE1
 if %year% LEQ 1000 echo 输入错误：请输入正确年份！&& ping /n 3 127.0.0.1 > nul && goto RE1
 if %year% GEQ 3000 echo 输入错误：请输入正确年份！&& ping /n 3 127.0.0.1 > nul && goto RE1
@@ -95,10 +94,10 @@ if not exist target_URL.txt echo. 2>target_URL.txt
 if exist target_URL.txt cat -b target_URL.txt
 echo.
 echo =======================================
-echo 操作：E_编辑列表;C_清空列表；F_查找弹幕
-echo 说明：S_开始下载;Q_返回上层
+echo 操作：E_编辑列表;C_清空列表；F_查找弹幕；Q_返回上层
 echo =======================================
-set /p target_URL=请粘贴URL、AV号或CID号：
+set target_URL=S
+set /p target_URL=请粘贴URL、AV号或CID号(按回车开始下载)：
 set target_URL=%target_URL:http://www.bilibili.com/video/=%
 set target_URL=%target_URL:https://www.bilibili.com/video/=%
 set target_URL=%target_URL:http://www.jijidown.com/video/=%
@@ -107,7 +106,7 @@ if "%target_URL: =%" NEQ "%target_URL%" echo 输入错误：请不要输入空格！ && ping 
 if /i "%target_URL%"=="S" goto main
 if /i %target_URL%==E start /wait target_URL.txt && goto RE2
 if /i %target_URL%==C echo. 2>target_URL.txt && goto RE2
-if /i %target_URL%==F start https://www.biliplus.com/api/do.php?act=search^&word=%moviename%^&p=1^&o=default^&n=30 && start https://www.bilibili.com/sp/%moviename% && start http://so.iqiyi.com/so/q_%moviename% && start http://www.soku.com/search_video/q_%moviename% && start http://v.qq.com/x/search/?q=%moviename% && goto RE2
+if /i %target_URL%==F start https://www.biliplus.com/api/do.php?act=search^&word=%moviename%^&p=1^&o=default^&n=30^&source=biliplus && start https://www.biliplus.com/api/do.php?act=search^&word=%moviename%^&p=1^&o=default^&n=30^&source=bilibili && start https://www.bilibili.com/sp/%moviename% && start https://www.baidu.com/s?wd=%moviename%%target_keyword%弹幕 && start http://so.iqiyi.com/so/q_%moviename% && start http://www.soku.com/search_video/q_%moviename% && start http://v.qq.com/x/search/?q=%moviename% && goto RE2
 if /i %target_URL%==Q goto RE0
 findstr "%target_URL%" target_URL.txt >nul && echo 警告：重复任务！ && ping -n 2 127.0.0.1 >nul && goto RE2
 findstr "%target_URL%" %batpath%\AppData\movie_backup.md >nul && echo 警告：已下载！ && ping -n 2 127.0.0.1 >nul && goto RE2 || echo %target_URL%>>target_URL.txt && goto RE2
@@ -143,7 +142,6 @@ if exist %batpath%\Temp\*.* del /q %batpath%\Temp\*.*
 set /a chronography=(%hourend%-%hourstart%)*60*60+(%minuteend%-%minutestart%)*60+(%secondend%-%secondstart%)
 cd %batpath%
 ping /n 2 127.0.0.1 >nul
-pause
 goto RE0
 
 
@@ -175,14 +173,16 @@ goto :eof
 :share
 @echo off
 set dateadd=%date:/=%
-set dateadd=%dateadd:~0,8%
+set dateadd=[%dateadd:~0,8%]
 echo 本弹幕由[Danmugenius%version%](https://github.com/liuzj288/DanmuGenius)下载并分享!> "%batpath%\Temp\info.md"
+set category=
 if exist %batpath%\Download\%moviename%（%year%）\*_youku.xml set category=%category%优酷
 if exist %batpath%\Download\%moviename%（%year%）\*_iqiyi.xml set category=%category%爱奇艺
 if exist %batpath%\Download\%moviename%（%year%）\*_tencent.xml set category=%category%腾讯
 if exist %batpath%\Download\%moviename%（%year%）\*_diyidan.xml set category=%category%第一弹
 if exist %batpath%\Download\%moviename%（%year%）\*_tucao.xml set category=%category%tucao
 if exist %batpath%\Download\%moviename%（%year%）\*_acfun.xml set category=%category%acfun
+if "%category%" NEQ "" set category=[%category%]
 if exist %batpath%\Download\%moviename%（%year%）\*.xml cat %batpath%\Temp\target_URL.txt>> "%batpath%\Download\%moviename%（%year%）\原始资源.txt"
-if exist %batpath%\Download\%moviename%（%year%）\*.xml winrar a -y -ep1 -ibck "%batpath%\Share\%moviename%[%year%][%category%][%dateadd%].7z" "%batpath%\Download\%moviename%（%year%）" "%batpath%\Temp\info.md" && explorer.exe /select,%batpath%Share\%moviename%[%year%][%category%][%dateadd%].7z
+if exist %batpath%\Download\%moviename%（%year%）\*.xml winrar a -y -ep1 -ibck -o+ "%batpath%\Share\%moviename%[%year%]%category%%dateadd%.7z" "%batpath%\Download\%moviename%（%year%）" "%batpath%\Temp\info.md" && explorer.exe /select,%batpath%Share\%moviename%[%year%]%category%%dateadd%.7z
 goto :eof
