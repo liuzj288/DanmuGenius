@@ -6,4 +6,4 @@ java -jar %batpath%\Plugin\danmu-tools\downloader.jar -u %target%
 set /a quantity=%quantity%+1
 cd %batpath%\Plugin\danmu-tools\DanMu\ 
 if exist "*.xml" ren "*.xml" "*." && ren "*." "*_%web%.xml"
-if exist "%batpath%\Plugin\danmu-tools\DanMu\*.xml" move "%batpath%\Plugin\danmu-tools\DanMu\*.xml" "%batpath%\Download\%moviename%£¨%year%£©\" 
+if exist "%batpath%\Plugin\danmu-tools\DanMu\*.xml" move "%batpath%\Plugin\danmu-tools\DanMu\*.xml" "%batpath%\Download\%moviename%£¨%year%£©\" >nul

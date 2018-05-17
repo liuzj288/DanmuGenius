@@ -21,7 +21,7 @@ egrep -A1 "^Title" target_av2cidgbk.temp | sed "/Title/d;/--/d" | sed "s#[[:blan
 
 :get_cid
 setlocal enabledelayedexpansion
-set /p quantity<=quantity.temp
+set /p quantity=<quantity.temp
 set /a m=1001
 set /a n=1
 for /f %%z in (target_pcid.temp) do (
@@ -35,7 +35,7 @@ call :get_xml !target_pcid!
 for %%i in ( %batpath%\temp\cid!target_pcid!.xml )do if %%~zi lss 51200 ( del "%%i" ) else (
 move %batpath%\temp\cid!target_pcid!.xml "%batpath%\Download\%moviename%£¨%year%£©\av!target_av: =!_P!m:~-2!_!target_pntitle!_cid!target_pcid!.xml" >nul
 call :save_data "!target_pcid: =!" "!target_av: =!" "P!m:~-2! !target_pntitle!" "!target_title! %target_keyword%"
-set /a quantity=!quantity!+1
+set /a quantity=!quantity: =!+1
 
 )
 set /a n=!n!+1
@@ -68,8 +68,8 @@ iconv -c -f GBK -t UTF-8 %1.temp > cid%1.xml && del %1.temp
 goto :eof
 
 :save_data
-if not exist %batpath%\AppData\movie_backup.md echo "| movie | av | ptitle | cid | addtime | note |" > %batpath%\AppData\movie_backup.md && echo "| :-: | :-: | - | :-: | :-: | - |" >> %batpath%\AppData\movie_backup.md
-findstr "cid%1" %batpath%\AppData\movie_backup.md >nul && echo. || echo "| [%moviename%(%year%)](https://movie.douban.com/subject_search?search_text=%moviename%) <br/>[Bili+](https://www.biliplus.com/api/do.php?act=search&word=%moviename%) [´ÅÁ¦](http://cn.btbit.xyz/list/%moviename%.html) [×ÖÄ»](http://assrt.net/sub/?searchword=%moviename%) [×ÖÄ»](http://subhd.com/search0/%moviename%)</br> | [av%2](http://www.bilibili.com/video/av%2) <br/>[Bili+](https://www.biliplus.com/all/video/av%2) [ßóßó](http://www.jijidown.com/video/av%2)</br>  | %3 | [cid%1](http://comment.bilibili.tv/%1.xml) <br/>[È«µ¯Ä»](https://www.biliplus.com/open/moepus.powered.full-danmaku.php#%1)</br> | %date:~0,10% | %4 |" >> %batpath%\AppData\movie_backup.md
+if not exist %batpath%\AppData\movie_backup.md echo "| movie | av | ptitle | cid | addtime | note |" > %batpath%\AppData\movie_backup.md && echo "| :-: | :-: | - | :-: | :-: | - |">> %batpath%\AppData\movie_backup.md
+findstr "cid%1" %batpath%\AppData\movie_backup.md >nul && echo. || echo "| [%moviename%(%year%)](https://movie.douban.com/subject_search?search_text=%moviename%) <br/>[Bili+](https://www.biliplus.com/api/do.php?act=search&word=%moviename%) [´ÅÁ¦](http://cn.btbit.xyz/list/%moviename%.html) [×ÖÄ»](http://assrt.net/sub/?searchword=%moviename%) [×ÖÄ»](http://subhd.com/search0/%moviename%)</br> | [av%2](http://www.bilibili.com/video/av%2) <br/>[Bili+](https://www.biliplus.com/all/video/av%2) [ßóßó](http://www.jijidown.com/video/av%2)</br>  | %3 | [cid%1](http://comment.bilibili.tv/%1.xml) <br/>[È«µ¯Ä»](https://www.biliplus.com/open/moepus.powered.full-danmaku.php#%1)</br> | %date:~0,10% | %4 |">> %batpath%\AppData\movie_backup.md
 sed -i "s/\"//g" %batpath%\AppData\movie_backup.md
 if exist %batpath%\AppData\*. del %batpath%\AppData\*.
 if not exist %batpath%\AppData\movie_backup.temp echo "| movie | av | ptitle | cid | addtime | note |" > %batpath%\AppData\movie_backup.temp && echo "| :-: | :-: | - | :-: | :-: | - |" >> %batpath%\AppData\movie_backup.temp
