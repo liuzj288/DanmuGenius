@@ -40,6 +40,8 @@ SETLOCAL DISABLEDELAYEDEXPANSION
 
 :end
 echo %quantity% >quantity.temp
+set category=%category:Bվ:=%
+set category=%category%Bվ
 goto :eof
 
 

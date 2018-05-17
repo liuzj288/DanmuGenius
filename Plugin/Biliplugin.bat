@@ -1,23 +1,13 @@
 @echo OFF
-set version=1.0.3
+set version=1.0.5
 title=Biliplugin %version%：正在下载 %target%
 if "%target%"=="" echo 请使用启动器启动 && ping /5 127.0.0.1 >nul && exit
 
 :main
-echo %target%| findstr /r "[aA][vV]" >nul && echo %target%| sed -r "s#http://www.jijidown.com/video/[aA][vV]##g;s#[aA][vV]##g;s#/##g"> target_av.temp && goto av2cid
-
-:av2cid
-rem 使用唧唧接口获取对应信息
+echo %target%| findstr /r "[aA][vV]" >nul && echo %target%|sed -r "s#[aA][vV]##g;s#/##g;s# ##g">target_av.temp
 set /P target_av=<target_av.temp
-curl -s -o target_av2cidutf8.temp http://www.jijidown.com/Api/AvToCid/%target_av%/0
-iconv -c -f UTF-8 -t GBK target_av2cidutf8.temp > target_av2cidgbk.temp
-sed -i "s#:#\n#g;s#,#\n#g;s#/##g;s#}##g;s#哔哩哔哩 (゜-゜)つロ 干杯~#%moviename%##g;s#视频去哪了呢？#%moviename%#g;s#YPE html>##g;s#]##g" target_av2cidgbk.temp
-sed -i "s/\"//g" target_av2cidgbk.temp
-if exist *. del *.
-egrep -A1 "^title" target_av2cidgbk.temp | sed "/title/d;/--/d;/^$/d" | sed -r "s/[[:blank:][:punct:]]/_/g;s/%target_av: =%//g;s/哔哩哔哩弹幕视频网_____゜__゜_つロ__乾杯_____bilibili_______________________________________//g;s/该视频已被B站删除//g" > target_title.temp && set target_title=&& set /P target_title=<target_title.temp
-egrep -A1 "^CID" target_av2cidgbk.temp | sed -r "s/[[:blank:][:punct:]]//g" | sed -r "/^CID/d;/^$/d;/^0$/d" |uniq > target_pcid.temp
-for /f "delims=" %%p in ('sed -n "$=" target_pcid.temp') do set /a pcid_num=%%p
-egrep -A1 "^Title" target_av2cidgbk.temp | sed "/Title/d;/--/d" | sed "s#[[:blank:]][[:blank:]]*#_#g;s#[[:blank:]()>!.]#_#g;s#/##g;s#]##g;s#%moviename%##g" | sed "/^$/d;/哔哩哔哩弹幕视频网/d;/bilibili/d" > target_ptitle.temp && seq -f"P%%02g"  1 1 99 >> target_ptitle.temp
+call :av2cid %target_av: =%
+pause
 
 :get_cid
 setlocal enabledelayedexpansion
@@ -44,22 +34,41 @@ set /a m=!m!+1
 
 :end
 echo %quantity% >quantity.temp
+set category=%category:B站:=%
+set category=%category%B站
 goto :eof
 
 
 ::=========================
 ::函数部分开始
 ::=========================
+
+:av2cid
+curl -s -o target_av2cidutf8.temp http://www.jijidown.com/Api/AvToCid/%1/0
+iconv -c -f UTF-8 -t GBK target_av2cidutf8.temp > target_av2cidgbk.temp
+sed -i "s/\"//g" target_av2cidgbk.temp
+sed -i "s/},{/\n/g;s/title/\ntitle/g;s/,time/\n,time/g;s/AV/\nAV/g;s/://g;s/?//g" target_av2cidgbk.temp
+sed -i "/^$/d;1d;3d" target_av2cidgbk.temp
+if exist *. del *.
+egrep "title" target_av2cidgbk.temp |sed "s/title//g;s/%target_av: =%//g;s/哔哩哔哩弹幕视频网_____゜__゜_つロ__乾杯_____bilibili_______________________________________//g;s/该视频已被B站删除//g">target_title.temp  && set target_title=&& set /P target_title=<target_title.temp
+sed "s/,/\n/g" target_av2cidgbk.temp| egrep "CID" |sed "s/CID//g"|uniq > target_pcid.temp
+for /f "delims=" %%p in ('sed -n "$=" target_pcid.temp') do set /a pcid_num=%%p
+egrep "Title" target_av2cidgbk.temp | sed -r "s/AV[0-9]*,//g;s/,CID[0-9]*,//g;s/Title/ /g" | sed "s/}]}//g">target_ptitle.temp
+goto :eof
+
+
 :get_xml
-curl -k -L -# --compressed -o "%1_new.xml" http://comment.bilibili.com/%1.xml 
+echo 正在下载当前弹幕……
+curl -k -L -# --compressed -o "%1_new.xml" http://comment.bilibili.com/%1.xml
+echo 正在获取历史弹幕……
 curl -k -L -s --compressed -o "target_rolldate.temp" http://comment.bilibili.com/rolldate,%1
 sed -i "s/\"/\n/g" target_rolldate.temp 
 sed -i "/new/,+3d;/[[:punct:]]/d;/timestamp/d" target_rolldate.temp && del *.
 for /f "delims=" %%r in ('sed -n "$=" target_rolldate.temp') do set /a target_interval=%%r/5
 sed -n "1~%target_interval%p" target_rolldate.temp > target_timestamp.temp
 cat target_timestamp.temp | xargs -n 1 -P 15 -I {} curl -s -k -L --compressed -o %1_{}.xml http://comment.bilibili.com/dmroll,{},%1
+echo 正在清洗合并弹幕……
 sed -ir "s/><d/>\n<d/g;1d;$d;/[我卧沃广][操槽日靠电]/d" %1_*.xml && del *.
-
 copy %1_new.xml + %1_*.xml >nul
 iconv -c -f UTF-8 -t GBK  %1_new.xml |sort |uniq > %1.temp && del %1_*.* 
 sed -i "1i <?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><i><chatserver>chat.bilibili.com</chatserver><chatid>%1</chatid><mission>0</mission><maxlimit>8000</maxlimit><state>0</state><realname>%2</realname><source>e-r</source>" %1.temp
