@@ -1,6 +1,4 @@
 @echo off
-echo 插件
-pause
 if "%target%"=="" echo 请使用启动器启动 && ping /5 127.0.0.1 >nul && exit
 title=Tucaoplugin 1.0.1 正在下载 %target%
 set target=%target:http://www.tucao.tv/play/h=%
@@ -24,7 +22,7 @@ set /a n=1001
 for /f %%i in (target_ptitle.temp) do (
 cls
 echo 正在下载 P!n:~-2!/%target_pnum%：%%i
-curl -# -k -L --retry 5 --retry-delay 40 -o "%batpath%\Download\%moviename%（%year%）\P!n:~-2!_%%i_tucao.xml" %xmlurl_pre%!m!
+curl -# -k -L --retry 5 --retry-delay 40 -o "%batpath%\Download\%moviename%[%year%]\P!n:~-2!_%%i_tucao.xml" %xmlurl_pre%!m!
 set /a quantity=!quantity: =!+1
 set /a m=!m!+1
 set /a n=!n!+1

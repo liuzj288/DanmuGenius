@@ -13,7 +13,6 @@ for /f "delims=" %%p in ('sed -n "$=" target_epid.temp') do set /a epid_num=%%p
 
 :main
 SETLOCAL ENABLEDELAYEDEXPANSION
-set /p quantity=<quantity.temp
 set /a m=1001
 set /a n=1
 for /f %%z in (target_epid.temp) do (
@@ -29,9 +28,8 @@ egrep -A1 "^cid" target_gbk.temp |egrep "^[0-9]" |head -1 > target_pcid.temp && 
 echo 正在下载 !n!/%epid_num%：av!target_av!_cid!target_pcid!
 call :get_xml !target_pcid!
 for %%i in ( %batpath%\temp\cid!target_pcid!.xml )do if %%~zi lss 51200 ( del "%%i" ) else (
-move %batpath%\temp\cid!target_pcid!.xml  "%batpath%\Download\%moviename%（%year%）\av!target_av: =!_P!m:~-2!_%target_title%_!target_ptitle!_cid!target_pcid!.xml" >nul
+move %batpath%\temp\cid!target_pcid!.xml  "%batpath%\Download\%moviename%[%year%]\av!target_av: =!_P!m:~-2!_%target_title%_!target_ptitle!_cid!target_pcid!.xml" >nul
 call :save_data "!target_pcid: =!" "!target_av: =!" "P!m:~-2! !target_ptitle!" "%target_keyword%"
-set /a quantity=!quantity: =!+1
 )
 set /a n=!n!+1
 set /a m=!m!+1
@@ -63,7 +61,7 @@ sed -ir "s/><d/>\n<d/g;1d;$d;/[我卧沃广][操槽日靠电]/d" %1_*.xml && del *.
 copy %1_new.xml + %1_*.xml >nul
 iconv -c -f UTF-8 -t GBK  %1_new.xml |sort |uniq > %1.temp && del %1_*.* 
 sed -i "1i <?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><i><chatserver>chat.bilibili.com</chatserver><chatid>%1</chatid><mission>0</mission><maxlimit>8000</maxlimit><state>0</state><realname>%2</realname><source>e-r</source>" %1.temp
-sed -i "$a </li>" %1.temp && del *.
+sed -i "$a </i>" %1.temp && del *.
 iconv -c -f GBK -t UTF-8 %1.temp > cid%1.xml && del %1.temp
 goto :eof
 

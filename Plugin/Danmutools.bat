@@ -9,7 +9,7 @@ cd %batpath%\Plugin\danmu-tools\DanMu\
 if exist "*.xml" ren "*.xml" "*." && ren "*." "*_%web%.xml"
 ls -l |grep "^-"|wc -l>%batpath%\Temp\quantitynew.temp
 set /p quantitynew=<%batpath%\Temp\quantitynew.temp
-if exist "%batpath%\Plugin\danmu-tools\DanMu\*.xml" move "%batpath%\Plugin\danmu-tools\DanMu\*.xml" "%batpath%\Download\%moviename%£¨%year%£©\" >nul
+if exist "%batpath%\Plugin\danmu-tools\DanMu\*.xml" move "%batpath%\Plugin\danmu-tools\DanMu\*.xml" "%batpath%\Download\%moviename%[%year%]\" >nul
 
 set /a quantity=%quantity%+%quantitynew%
 echo %quantity%> %batpath%\Temp\quantity.temp
