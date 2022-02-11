@@ -1,11 +1,18 @@
+# DanmuGenius弹幕批量下载
 
 
 # 功能演示
-1.![](/image/示例1 av号下载弹幕.gif)
-2.
-3.
-4.
+1.Biliplus弹幕下载
+![](https://github.com/liuzj288/DanmuGenius/blob/4bd263e1a0ca5d56e37d2c5feb3ac7ec53eb5aa8/image/%E7%A4%BA%E4%BE%8B1%20av%E5%8F%B7%E4%B8%8B%E8%BD%BD%E5%BC%B9%E5%B9%95.gif)
 
+2.
+![]()
+
+3.Bilibili弹幕下载
+![]()
+
+4.
+![]()
 
 # 环境配置
 
