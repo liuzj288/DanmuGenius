@@ -1,5 +1,10 @@
 # DanmuGenius弹幕批量下载 & 弹幕备份计划
 
+# 支持网站
+1.https://www.biliplus.com/
+
+2.https://www.bilibili.com/
+
 
 # 功能演示
 1.Biliplus旧番弹幕下载
